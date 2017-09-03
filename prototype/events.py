@@ -2,14 +2,23 @@ import logging
 
 logger = logging.getLogger("supervasion")
 
+events_detected = []
+
 class Events(object):
 
     @classmethod
     def print_event(cls, kwargs):
+        events_detected.append(kwargs)
         logger.info("=======================================")
         for k, v in kwargs.iteritems():
             logger.info("%s: %s"%(str(k), str(v)))
         logger.info("=======================================")
+
+
+    @classmethod
+    def get_events_detected(cls):
+        global events_detected
+        return events_detected
 
     @classmethod
     def close_instrument(cls, instrument, num_frame, time_frame):
