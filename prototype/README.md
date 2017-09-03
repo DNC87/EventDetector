@@ -52,7 +52,38 @@ pip install -r requirements.txt
 The prototype can be executed with the following command:
 
 ```bash
-python main.py -n videos/exercise_1/video_example_cam_1.mp4 videos/exercise_1/video_example_cam_2.mp4
+python main.py -n videos/exercise_1/video_example_cam_1.mp4
+videos/exercise_1/video_example_cam_2.mp4 --output_file <filename>
 ```
 
-After execution, the prototype will generate an output file with the sequence of events detected in the `logfiles` folder. The `Frame`and `Time-Frame` fields indicate the concrete frame and the instant of time when an event is detected. Additionally, the fields `Event`, `Instrument` and `Target` contain information about the type of event and its parameters. 
+After execution, the prototype will generate in the output file (given as
+parameter), the sequence of events detected in JSON format. The output will be like the following:
+
+ ```javascript
+[{
+	"Instrument": "forceps",
+	"Frame": 121,
+	"Time_Frame": 15,
+	"Event": "appears"
+}, {
+	"Instrument": "forceps",
+	"Frame": 133,
+	"Time_Frame": 17,
+	"Event": "starts_moving"
+}, {
+	"Instrument": "forceps",
+	"Frame": 140,
+	"Time_Frame": 18,
+	"Event": "stops"
+}, {
+	"Instrument": "forceps",
+	"Frame": 141,
+	"Time_Frame": 19,
+	"Event": "opens"
+},
+...]
+
+```
+
+The `Frame` and `Time-Frame`
+fields indicate the concrete frame and the instant of time when an event is detected. Additionally, the fields `Event`, `Instrument` and `Target` contain information about the type of event and its parameters.
