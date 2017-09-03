@@ -52,7 +52,6 @@ class Pan(Element):
         mass_centers = calculate_mass_centers(cnts)
         if len(contours_detected) != 0:
             if self.name == "left_pan":
-                cv2.imshow("pan_{}".format(self.name), mask)
                 position = mass_centers[0]
             else:
                 position = mass_centers[1]
@@ -150,7 +149,6 @@ class Instrument(Element):
     def detect_is_in_scene(self, frame, frame_pos, frame_sec):
         # Detecting marks contours on instrument
         mask = create_mask(frame, self.lower_colors, self.upper_colors)
-        cv2.imshow("instrument_{}".format(self.name), mask)
         contours_detected = find_contours(mask)
         if len(contours_detected) > 0 and self.is_in_scene == False:
             self.is_in_scene = True
