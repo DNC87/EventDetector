@@ -30,7 +30,7 @@ LOGGING_CONFIG = {
             "class": "logging.handlers.RotatingFileHandler",
             "level": "INFO",
             "formatter": "simple",
-            "filename": os.path.join("logfiles","info_{}.log".format(datetime.now().strftime("%Y%m%d-%H%M%S"))),
+            "filename": os.path.join("logfiles","info.log"),
             "maxBytes": 10485760,
             "backupCount": 20,
             "encoding": "utf8"

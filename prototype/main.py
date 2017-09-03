@@ -16,6 +16,9 @@ import settings
 from cv_utils import (paint_distance_in_frame)
 from elements import Pan, Instrument, Bean
 
+from events import Events
+import json
+
 # Logging configuration extracted from:
 # https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
 if settings.LOGGING_CONFIG:
@@ -33,11 +36,18 @@ def get_program_arguments():
                                         "in exercise 1 execution. This "
                                         "prototype can works both "
                                         "online and video inputs.")
-    parser.add_argument("--output",
+    parser.add_argument("--output_videos",
                         help="Enable the video output with some "
                              "information related with frame position "
                              "and time-frame (in seconds).",
                         action="store_true")
+
+    parser.add_argument("--output_file",
+                        help="Output file where the prototype will write the "
+                             "events detected in JSON format.",
+                        type=str,
+                        required=True)
+
     online_parser = parser.add_mutually_exclusive_group(required=True)
     online_parser.add_argument("-o", "--online",
                         dest='online_feature',
@@ -201,18 +211,18 @@ def main():
     cap_R.set(3, settings.VIDEO_WIDTH), cap_R.set(4, settings.VIDEO_HEIGHT)
 
     # Preparing the video output
-    if args.output:
+    if args.output_videos:
         video_name = datetime.now().strftime("%Y%m%d-%H%M%S")
         video_cam_1 = "output_{}_cam_1.mp4".format(video_name)
         mp4v = cv2.cv.CV_FOURCC(*'mp4v')
-        output_1 = cv2.VideoWriter(
+        output_video_1 = cv2.VideoWriter(
             os.path.join("videos", video_cam_1),
             mp4v,
             10,
             (int(cap_L.get(3)), int(cap_L.get(4))))
         video_cam_2 = "output_{}_cam_2.mp4".format(video_name)
         mp4v = cv2.cv.CV_FOURCC(*'mp4v')
-        output_2 = cv2.VideoWriter(
+        output_video_2 = cv2.VideoWriter(
             os.path.join("videos", video_cam_2),
             mp4v,
             10,
@@ -276,7 +286,11 @@ def main():
                                                                frame_R))
 
         # Creating disparity map
-        disparity_map = get_disparity(rf_frame_L, rf_frame_R, method="BM")
+        try:
+            disparity_map = get_disparity(rf_frame_L, rf_frame_R, method="BM")
+        except Exception as e:
+            logger.error(e)
+            break
 
         # Some of techniques can alterate the original frame, we create a copy
         # to these cases
@@ -333,13 +347,19 @@ def main():
         cv2.imshow("output", frame_cpy)
         cv2.imshow("DM", disparity_map)
 
-        if args.output:
-            output_1.write(frame_L)
-            output_2.write(frame_R)
+        if args.output_videos:
+            output_video_1.write(frame_L)
+            output_video_2.write(frame_R)
 
         # Press 'q' key to close the window with the video
         if (cv2.waitKey(1) & 0xFF == ord("q")):
             break
+
+    # Writing the detected events in the output file given as argument
+    if args.output_file:
+        with open(args.output_file, "w") as f:
+            events_list = Events.get_events_detected()
+            f.write(json.dumps(json.dumps(events_list)))
 
     # When everything done, release the capture
     cap_L.release()
