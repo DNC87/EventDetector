@@ -359,7 +359,7 @@ def main():
     if args.output_file:
         with open(args.output_file, "w") as f:
             events_list = Events.get_events_detected()
-            f.write(json.dumps(json.dumps(events_list)))
+            f.write(json.dumps(events_list))
 
     # When everything done, release the capture
     cap_L.release()
